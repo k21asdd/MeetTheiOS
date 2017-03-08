@@ -11,6 +11,7 @@ import SpriteKit
 class GameScene: SKScene, SKPhysicsContactDelegate{
     let verticalPipeGap = 150.0
     
+    var splitLine:UInt32!
     var bird:SKSpriteNode!
     var skyColor:SKColor!
     var pipeTextureUp:SKTexture!
@@ -26,6 +27,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     let worldCategory: UInt32 = 1 << 1
     let pipeCategory: UInt32 = 1 << 2
     let scoreCategory: UInt32 = 1 << 3
+
     
     override func didMove(to view: SKView) {
         
@@ -34,6 +36,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         // setup physics
         self.physicsWorld.gravity = CGVector( dx: 0.0, dy: -5.0 )
         self.physicsWorld.contactDelegate = self
+        self.splitLine = UInt32(self.frame.size.width)/2
         
         // setup background color
         skyColor = SKColor(red: 81.0/255.0, green: 192.0/255.0, blue: 201.0/255.0, alpha: 1.0)
@@ -206,9 +209,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if moving.speed > 0  {
-            for _ in touches { // do we need all touches?
-                bird.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-                bird.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 30))
+            for touch in touches { // do we need all touches?
+                if UInt32(floor(touch.location(in: self).x)) < self.splitLine {
+                    bird.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+                    bird.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 30))
+                }else{
+                    bird.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+                    bird.physicsBody?.applyImpulse(CGVector(dx: 0, dy: -30))
+                }
+                
             }
         } else if canRestart {
             self.resetScene()
