@@ -23,6 +23,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     var scoreLabelNode:SKLabelNode!
     var score = NSInteger()
     
+    
     let birdCategory: UInt32 = 1 << 0
     let worldCategory: UInt32 = 1 << 1
     let pipeCategory: UInt32 = 1 << 2
@@ -209,7 +210,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if moving.speed > 0  {
-            for touch in touches { // do we need all touches?
+            if let touch = touches.first {
                 if UInt32(floor(touch.location(in: self).x)) < self.splitLine {
                     bird.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
                     bird.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 30))
