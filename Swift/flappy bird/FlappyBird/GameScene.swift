@@ -22,7 +22,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
     var canRestart = Bool()
     var scoreLabelNode:SKLabelNode!
     var score = NSInteger()
-    
+    var midOfFlyHigh:CGFloat!
+    var moveGap:CGFloat!
     
     let birdCategory: UInt32 = 1 << 0
     let worldCategory: UInt32 = 1 << 1
@@ -94,6 +95,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         let movePipes = SKAction.moveBy(x: -distanceToMove, y:0.0, duration:TimeInterval(0.01 * distanceToMove))
         let removePipes = SKAction.removeFromParent()
         movePipesAndRemove = SKAction.sequence([movePipes, removePipes])
+        
+        midOfFlyHigh = (self.frame.size.height - groundTexture.size().height)/2
+        moveGap = pipeTextureUp.size().height / 2.0
         
         // spawn the pipes
         let spawn = SKAction.run(spawnPipes)
@@ -182,7 +186,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         contactNode.physicsBody?.contactTestBitMask = birdCategory
         pipePair.addChild(contactNode)
         
-        pipePair.run(movePipesAndRemove)
+        let distanceToMove = CGFloat(self.frame.size.width + 2.0 * pipeTextureUp.size().width)
+        var distanceToMovw_Y:CGFloat!
+        
+        if (midOfFlyHigh > (pipeUp.position.y + CGFloat(verticalPipeGap/2)))
+        {
+            print("mid ", midOfFlyHigh)
+            print("pipe ", pipeUp.position.y)
+            print("gap ", verticalPipeGap/2)
+            print ("Big")
+            distanceToMovw_Y = moveGap
+        }
+        else
+        {
+            distanceToMovw_Y = (-moveGap)
+        }
+        print(distanceToMovw_Y)
+        let upPipes = SKAction.moveBy(x: 0.0, y:distanceToMovw_Y, duration:TimeInterval(0.01 * distanceToMove))
+        let downPipes = SKAction.moveBy(x: 0.0, y:distanceToMovw_Y, duration:TimeInterval(0.01 * distanceToMove))
+        let removePipes = SKAction.removeFromParent()
+        let movePipes_Y = SKAction.group([upPipes, downPipes])
+        let movePipesAndRemove_Y = SKAction.sequence([movePipes_Y, removePipes])
+        
+        let movePipeRemove = SKAction.group([movePipesAndRemove, movePipesAndRemove_Y])
+        pipePair.run(movePipeRemove)
         pipes.addChild(pipePair)
         
     }
